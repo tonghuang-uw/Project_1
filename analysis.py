@@ -60,9 +60,9 @@ def technical_analysis(df, technical_analysis_choice):
     if technical_analysis_choice == "Moving Average":
         print("\n---The Moving Average can define the main trend of the stock.---\n")
         print("......")
-        print("The system use 42 days and 252 day moving average as buy and sell signals.\n")
-        print("Buy signal: The 42 days moving average is above the 252 day moving average.\n")
-        print("Sell signal: The 42 days moving average is below the 252 day moving average.\n")
+        print("The system use 7 days and 21 day moving average as buy and sell signals.\n")
+        print("Buy signal: The 7 days moving average is above the 21 day moving average.\n")
+        print("Sell signal: The 7 days moving average is below the 21 day moving average.\n")
         print("......")
         return moving_average_analysis(df)
     else:
