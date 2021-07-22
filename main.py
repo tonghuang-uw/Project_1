@@ -85,6 +85,7 @@ def load_ticker(ticker):
     df = pd.DataFrame(df[f'{ticker}']['close'])
     
     return df
+    
 
 def add_to_watch_list(ticker):
     """ Ask users if they want to add the ticker into watchlist.
