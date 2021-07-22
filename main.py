@@ -85,7 +85,7 @@ def load_ticker(ticker):
     df = pd.DataFrame(df[f'{ticker}']['close'])
     
     return df
-    
+
 
 def add_to_watch_list(ticker):
     """ Ask users if they want to add the ticker into watchlist.
@@ -144,16 +144,17 @@ if __name__ == "__main__":
     
     load_dotenv()
 
+    #API key
     alpaca_api_key = os.getenv("ALPACA_API_KEY")
     alpaca_secret_key = os.getenv("ALPACA_SECRET_KEY")
     alpaca = tradeapi.REST(alpaca_api_key, alpaca_secret_key, api_version ="v2")
 
     database_connection_string = "sqlite:///./SQL/stocks.db"
 
+    #Create database engine
     engine = sql.create_engine(database_connection_string)
-
-    print(engine)
     
+    #Ask if users want to choose stock or crypto
     s_o_c = choose_stocks_or_cryptos()
 
     if s_o_c == "Stocks":
@@ -166,10 +167,12 @@ if __name__ == "__main__":
         ).ask()
 
         print("Running report ...")
-        
 
+
+        #Return a dataframe of ticker chosen
         df = load_ticker(ticker)
 
+        #Return an analysis choice
         choice = technical_analysis_choice()
 
 
@@ -177,33 +180,49 @@ if __name__ == "__main__":
 
         add_to_watch_list(ticker)
 
-        print(engine.table_names())
-    
 
+        #If there are more than 2 stocks in watchlist, it can generate a minimize-variance optimizer
         if len(engine.table_names()) >= 2:
             print("The application provide an optimization when there are more than two stocks in the portfolio.")
             opts = questionary.confirm("Do you want to optimize the portfolio by minimizing the risk?").ask()
             if opts == True:
                 tickers = optimazer_tickers()
+
+                #Length of tickers users chose
                 noa = len(tickers)
-                print(tickers)
+                
                 data = pd.DataFrame()
-            
+
+                #Form a dataframe that contains close price of tickers users chose
                 for ticker in tickers:
                     data[ticker] = load_ticker(ticker)['close']
+
+                #Log return of tickers
                 log_returns = np.log(data/data.shift(1))
 
+                #A list that sum up to 1
                 weights = np.random.random(noa)
                 weights /= np.sum(weights)
+
+                #Expected portfolio return and expected portfolio votatility
                 pret,pvar = statistics(weights)
+                #Minimize variance
                 min_func_variance(weights)
+
+                #Constraints that all weights sum up to 1
                 cons = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+                #Bound within 0 and 1
                 bnds = tuple((0, 1) for x in range(noa))
+
+                #Get the optimal weighting of portfolio
                 optv = sco.minimize(min_func_variance, noa * [1. / noa,], method = 'SLSQP', bounds=bnds, constraints=cons)
                 optv_weighting = optv['x'].round(3)
+
+                #Return a dataframe
                 weighting_df = pd.DataFrame(optv_weighting,index=tickers,columns=['Weighting'])
                 print(weighting_df)
             else:
+                #Ask users if they want to delete any tickers
                 tickers = delete_ticker()
                 for ticker in tickers:
                     engine.execute(f'DROP TABLE {ticker}')
@@ -220,7 +239,8 @@ if __name__ == "__main__":
             "Please select a cryptocurrency you want to research:",
             choices=["BTC","ETH","UNI","BNB","AAVE","SUSHI","COMP","MKR","SNX","ADA","DOGE","SOL","POL"]
             ).ask()
-
+        
+        #Form individual crypto report based on what users chose from questionary.
         print("Running report...")
         if crypto == "BTC":
             btc()
