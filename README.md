@@ -24,8 +24,8 @@ The application provides a portfolio optimizer for stock tickers users select in
 
 ### USAGE 
 run $python main.py 
-answer the questionary
-get results!!
+- answer the questionary
+- get results!!
 
 ### Contributors
 - Matheus Guelfi
