@@ -8,7 +8,7 @@ The application provides analysis and visualization for historical data.
 The application provides a portfolio optimizer for stock tickers users select in the watchlist.
 
 
-### INSTALATION
+### INSTALLATION
 - import questionary
 - import pandas as pd
 - import alpaca_trade_api as tradeapi
